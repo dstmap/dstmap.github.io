@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Five DST Options: Evaluating Morning Impact on Health and School Children Safety</title>
+        <meta name="description" content="Interactive DST map Evaluates Five Daylight Saving Time Options">
+        <meta name="keywords" content="Interactive DST Map, Daylight Savings Time, Western Edge Effect, Changing the Clocks, DST and health">
+		<meta charset="utf-8">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.6.1/d3.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://unpkg.com/topojson@3"></script>
+		<style>
+            @import url('https://fonts.cdnfonts.com/css/tr-tempus-sans-itc');
+			@import url('https://fonts.googleapis.com/css2?family=Arimo&display=swap');
+            body,html {
+                height: 100%;
+                width: 100%;
+                padding: 0;
+                margin : 0;
+		        font-family: 'Arimo', sans-serif;
+            }
+            .main {
+                display: flex;
+                flex-direction: column;
+                font-family: 'Arimo', sans-serif;
+                font-size: 11pt;
+                width: 98%;
+                height: 100%;
+                left: 1%;
+                position: relative;
+            }
+            .middle {
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                width: 100%;
+                height: 80%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-content: flex-start;
+            }
+            .header {
+                height: 3vw;
+            }
+            .head-title {
+                font-family: 'Arimo', sans-serif;
+                font-size: 17pt !important;
+                font-weight: bold;
+                padding-bottom: 0.8em;
+                text-align: center !important;
+            }
+            .header span {
+                display: block;
+                width: 100%;
+                text-align: justify;
+                font-size: 11pt;
+            }
+            .footer {
+
+                font-size: 11pt;
+                text-align: justify;
+                padding-top: 1em;
+                position: relative;
+            }
+            .footer span {
+                display: block;
+                width: auto;
+                padding: 5px;
+            }
+            .svg-box{
+                display: flex;
+                position: relative;
+                aspect-ratio: 4/1.7;
+                width: 76%;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+            }    
+            #svgContainer {
+                width: 100%;
+                height: 100%;
+                display: flex;
+            }       
+            .left-side {
+                font-size: 1.1vw;
+                width: 24%;
+                height: auto;
+            }
+            .left-side p {
+                margin: 0;
+            }
+            .left-side h3 {
+                margin: 0.3em;
+            }
+            .county {
+                stroke-width: 1;
+                cursor: pointer;
+            }
+            .data-row {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+            .dynamic {
+                font-weight: bold;
+                color: #6b1b10;
+                padding-left: 1em;
+                width: 2.25em;
+            }
+            .b-dynamic {
+                font-weight: bold;
+                color: black;
+                padding-left: 0.25em;
+                width: 2.7em;
+            }
+			.county:hover {
+                fill: #d6206c;
+                stroke: #d6206c;
+			}
+			.tooltip {
+                position: absolute;
+                width: max-content;
+                text-align: left;
+                height: auto;
+                background-color: rgb(255 255 255 / 90%);
+                padding: 0px 3px;
+                font-size: 10pt;
+                font-weight: bold;
+                border-radius: 2px;
+                font-family: 'Arimo', sans-serif;
+                pointer-events: none;
+            }	
+            #radioGroup {
+                position: absolute;
+                font-size: 1.2vw;
+                background-color: #ffffffcc;
+                border-radius: 2px;
+                bottom: -10px;
+                left: 2px;
+            }
+            #mapComment {
+                position: absolute;
+                font-size: 1.2vw;
+                background-color: #ffffffcc;
+                border-radius: 2px;
+                bottom: 4%;
+                left: 41%;
+            }
+            #radioGroup p {
+                margin: 0;
+            }
+            #mapTitle {
+                font-size: 2.5em;
+                font-weight: bold;
+                font-family: 'Arimo', sans-serif;
+            }
+            .author {
+                text-align: center;
+                font-weight: bold;
+                font-size: 10pt;
+                color: #919191;
+            }
+            .author a {
+                color: #919191;
+            }
+            @media only screen and (max-width: 768px) {
+
+		    }	
+            @media only screen and (max-width: 1040px) {
+                .left-side {font-size: 1.1vw;}
+                .header span {font-size: 1.3vw;}
+                .head-title {font-size: 2vw !important;}
+                .footer {font-size: 1.3vw;}
+                .footer b {font-size: 1.45vw;}
+                .header span {padding: 0.9vw;}
+                .footer span {padding: 0.9vw;}
+                .author {font-size: 1.1vw;}
+                .tooltip {
+                    font-size: 1.2vw;
+                }
+                #radioGroup {
+                    font-size: 1.2vw;
+                    left: 0.5vw;
+                    bottom: -1vw;
+                    padding: 0.2vw;
+                }
+                #radioGroup input {
+                    width: 7%;
+                    height: 2vw;
+                    line-height: 0;
+                    vertical-align: text-bottom;
+                    margin: 0;
+                }
+                #radioGroup label {
+                    float: right;
+                    padding-top: 0.25vw;
+                }
+		    }           	       
+		</style>	
+	</head>
+	<body>
+		<div class="main">
+            <div class="header" id="header"></div>
+            <div class="middle">
+                <div class="left-side">
+                    <div class="data-outer">
+                        <div class="data-row"><h3 id="county-name">Pulaski, VA</h3><span class="dynamic">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>
+                    <div class="data-outer">
+                        <div class="data-row"><span>Population:</span><span class="dynamic" id="data-population" style="width: 5em;">34 k</span></div>
+                        <div class="data-row"><span>Solar Delay in minutes:</span><span class="dynamic" id="data-delay">23</span><span class="b-dynamic" id="b_data-delay">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>With DST, Delay in minutes:</span><span class="dynamic" id="data-delay-dst">83</span><span class="b-dynamic" id="b_data-delay-dst">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>
+                    <div class="data-outer">
+                        <div class="data-row"><h3>#1 No DST</h3><span class="dynamic">&nbsp;&nbsp;&nbsp;</span></div> 
+                        <div class="data-row"><span>% Sunrises after 7:00 AM:</span><span class="dynamic" id="nodst-pr-sun-7">28%</span><span class="b-dynamic" id="b_nodst-pr-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>Latest Sunrise:</span><span class="dynamic" id="nodst-min-sun-7">7:35</span><span class="b-dynamic" id="b_nodst-min-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>
+                    <div class="data-outer">
+                        <div class="data-row"><h3>#2 Memorial Day DST</h3><span class="dynamic">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>% Sunrises after 7:00 AM:</span><span class="dynamic" id="memorial-pr-sun-7">28%</span><span class="b-dynamic" id="b_memorial-pr-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>Latest Sunrise:</span><span class="dynamic" id="memorial-min-sun-7">7:35</span><span class="b-dynamic" id="b_memorial-min-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>
+                    <div class="data-outer">
+                        <div class="data-row"><h3>#3 1966-2006 DST</h3><span class="dynamic">&nbsp;&nbsp;&nbsp;</span></div> 
+                        <div class="data-row"><span>% Sunrises after 7:00 AM:</span><span class="dynamic" id="1966-pr-sun-7">42%</span><span class="b-dynamic" id="b_1966-pr-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>Latest Sunrise:</span><span class="dynamic" id="1966-min-sun-7">7:45</span><span class="b-dynamic" id="b_1966-min-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>
+                    <div>
+                        <div class="data-row"><h3>#4 2007 Current DST</h3><span class="dynamic">&nbsp;&nbsp;&nbsp;</span></div> 
+                        <div class="data-row"><span>% Sunrises after 7:00 AM:</span><span class="dynamic" id="current-pr-sun-7">51%</span><span class="b-dynamic" id="b_current-pr-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>Latest Sunrise:</span><span class="dynamic" id="current-min-sun-7">7:50</span><span class="b-dynamic" id="b_current-min-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>
+                    <div>
+                        <div class="data-row"><h3>#5 Permanent DST</h3><span class="dynamic">&nbsp;&nbsp;&nbsp;</span></div> 
+                        <div class="data-row"><span>% Sunrises after 7:00 AM:</span><span class="dynamic" id="permanent-pr-sun-7">58%</span><span class="b-dynamic" id="b_permanent-pr-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                        <div class="data-row"><span>Latest Sunrise:</span><span class="dynamic" id="permanent-min-sun-7">8:35</span><span class="b-dynamic" id="b_permanent-min-sun-7">&nbsp;&nbsp;&nbsp;</span></div>
+                    </div>                   
+                </div>
+                <div class="svg-box">
+                    <div id="svgContainer"></div>
+                </div>
+            </div>
+            <div class="footer">
+            </div>             
+		</div>	
+
+		<script>	
+            // svg container size
+			const w = 700;
+			const h = 450;
+			const padding = 10;
+
+            // color array for scale
+            const colors = ["#f3f3e6", "#7a9163", "#4f7b58", "#ab3130", "#6b1b10"];
+            
+            // first tooltip
+            const tooltip = d3.select("body").append("div")	
+				.attr("id", "tooltip")	
+                .attr("class", "tooltip")				
+				.style("opacity", 0);
+
+            // double tooltip
+            const tooltip2 = d3.select("body").append("div")	
+				.attr("id", "tooltip2")	
+                .attr("class", "tooltip")				
+				.style("opacity", 0);
+
+            // add "|" symbol if data is not empty
+            function symbolVal (val) {
+                if (!val.trim()) {
+                    return val;
+                } else {
+                    return '| ' + val;
+                }
+            };
+
+            // just div svgContainer for both maps
+            const svgCont = d3.select("#svgContainer"); 
+
+            // first svg element inside svgContainer
+            const svg1 = d3.select("#svgContainer")
+                .append("svg")
+                .attr("viewBox", `0 0 ${w} ${h}`);
+
+            // double svg element inside svgContainer
+            const svg2 = d3.select("#svgContainer")
+                .append("svg")
+                .attr("viewBox", `0 0 ${w} ${h}`);
+
+            // groups inside svg for scaling
+            const g1 = svg1.append("g");
+            const g2 = svg2.append("g");
+
+            // load all external source and waiting
+            Promise.all([
+                d3.csv("data.csv"),
+				d3.json("counties.json"),
+                ]).then(([datum, geom]) => {
+                    ready(null, datum, geom);
+            });
+
+            function ready(error, data, geo) {
+
+                // add layers to map
+                const counties = topojson.feature(geo, geo.objects.counties);
+                const states = topojson.feature(geo, geo.objects.states);
+                const lines = topojson.feature(geo, geo.objects.lines1);
+
+                // join data from topojson and csv
+                counties.features.forEach(function(county, i) {
+                    data.forEach(function(dat, j) {
+                        if (county.properties.CountID === dat.Count ) {
+                            Object.assign(county.properties, dat);
+                        }
+                    })
+                }); 
+                
+                // set projection with padding for map
+                const projection = d3.geoIdentity().reflectY(true)
+                    .fitExtent([[padding,padding],[w-padding,h-padding]], counties);
+
+                const path = d3.geoPath().projection(projection);
+
+                // set colors scale for counties
+                const colorScale = d3.scaleQuantile()
+					.domain([1, 2, 3, 4, 5])
+                    .range(colors);
+
+                // add counties layer to first map
+                g1.append("g")
+                    .selectAll("path")
+                    .data(counties.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("id", (d) => 'g1' + d.properties.Count) // id for highlight function
+                    .attr("fill", (d) => colorScale(parseInt(d.properties.Color_1)))
+                    .attr("stroke", (d) => colorScale(parseInt(d.properties.Color_1)))
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("class", "county")
+                    .on('mouseover', function (event, d)  {
+                        // highlight same feature in double map function
+                        $("#g2"+ d.properties.Count).css("fill", "#d6206c");
+                        $("#g2"+ d.properties.Count).css("stroke", "#d6206c");
+                        // show first tooltip
+                        tooltip.style("opacity", .9);
+                        // set left padding for first tooltip
+                        tooltip.style("left", (function () { 
+                            let tooltipWidth = document.getElementById('tooltip').getBoundingClientRect().width; // tooltip width
+                            let svgContainerWidth = document.getElementById('svgContainer').getBoundingClientRect().width; // width of whole svg container
+                            let boxWidth = svgContainerWidth / 2; // width of one svg 
+                            let padMain = (window.innerWidth / 100) * 2; // additional padding of '.main' div
+                            let limitWidth = (window.innerWidth - padMain - boxWidth - tooltipWidth) - 10; // max mouse left coords for standard tooltip position
+                            if (event.pageX > limitWidth) {return (event.pageX - tooltipWidth) + "px";} // if mouse coords is more than limit
+                            else {return event.pageX + "px";} // if mouse coords is standard
+                        }));  
+                        // set top padding for first tooltip                               
+                        tooltip.style("top", (function () {
+                            let headerHeight = document.getElementById('header').getBoundingClientRect().height; // get '.header' height
+                            let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height; // tooltip height
+                            let limitHeight = headerHeight + (tooltipHeight * 1.2); // max mouse vertical coords for standard tooltip position
+                            if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"} // if mouse coords is more than limit
+                            else {return (event.pageY - (tooltipHeight * 1.1)) + "px"} // if mouse coords is standard
+                        })); 
+                        // show second tooltip
+                        tooltip2.style("opacity", .9);
+                        // set left padding for second tooltip
+                        tooltip2.style("left", (function () { 
+                            let tooltipWidth = document.getElementById('tooltip2').getBoundingClientRect().width; // tooltip width
+                            let svgContainerWidth = document.getElementById('svgContainer').getBoundingClientRect().width; // width of whole svg container
+                            let boxWidth = svgContainerWidth / 2; // width of one svg 
+                            let padMain = (window.innerWidth / 100) * 2; // additional padding of '.main' div
+                            let limitWidth = (window.innerWidth - padMain - boxWidth - tooltipWidth) - 10; // max mouse left coords for standard tooltip position
+                            if (event.pageX > limitWidth) {return ((event.pageX + boxWidth) - tooltipWidth)  + "px";} // if mouse coords is more than limit
+                            else {return (event.pageX + boxWidth) + "px";} // if mouse coords is standard
+                        }));  
+                        // set top padding for tooltip                               
+                        tooltip2.style("top", (function () {
+                            let headerHeight = document.getElementById('header').getBoundingClientRect().height; // get '.header' height
+                            let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height; // tooltip height
+                            let limitHeight = headerHeight + (tooltipHeight * 1.2); // max mouse vertical coords for standard tooltip position
+                            if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"} // if mouse coords is more than limit
+                            else {return (event.pageY - (tooltipHeight * 1.1)) + "px"} // if mouse coords is standard
+                        }));  
+                        // add dynamic content to both tooltips
+                        tooltip.html("<span style='color: black;'>Short DST: </span><span style='color: #6b1b10;'>" + d.properties["#2_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#2_%aft7:00"]) + "</span><br><span style='color: black;'>Long DST:&nbsp;</span><span style='color: #6b1b10;'>" + d.properties["#4_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#4_%aft7:00"]) + "</span>");
+                        tooltip2.html("<span style='color: black;'>Short DST: </span><span style='color: #6b1b10;'>" + d.properties["#2_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#2_%aft7:00"]) + "</span><br><span style='color: black;'>Long DST:&nbsp;</span><span style='color: #6b1b10;'>" + d.properties["#4_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#4_%aft7:00"]) + "</span>");
+                        
+                        // change table data dynamically after each mouseover
+                        let selectedVal = $('input[name="radiogroup"]:checked').val(); 
+                        if (selectedVal === 'mouse') {
+                            $('#county-name').html(d.properties.Header);
+                            $('#data-population').html(d.properties.k_population);
+                            $('#data-delay').html(d.properties.Delay);
+                            $('#data-delay-dst').html(d.properties["Delay with DST"]);
+                            $('#nodst-pr-sun-7').html(d.properties["#1_%aft7:00"]);
+                            $('#nodst-min-sun-7').html(d.properties["#1 hour"]);
+                            $('#memorial-pr-sun-7').html(d.properties["#2_%aft7:00"]);
+                            $('#memorial-min-sun-7').html(d.properties["#2 hour"]);
+                            $('#1966-pr-sun-7').html(d.properties["#3_%aft7:00"]);
+                            $('#1966-min-sun-7').html(d.properties["#3 hour"]);
+                            $('#current-pr-sun-7').html(d.properties["#4_%aft7:00"]);
+                            $('#current-min-sun-7').html(d.properties["#4 hour"]);
+                            $('#permanent-pr-sun-7').html(d.properties["#5_%aft7:00"]);
+                            $('#permanent-min-sun-7').html(d.properties["#5 hour"]);
+
+                            $('#b_data-delay').html(symbolVal(d.properties.B_Delay));
+                            $('#b_data-delay-dst').html(symbolVal(d.properties["B_Delay with DST"]));
+                            $('#b_nodst-pr-sun-7').html(symbolVal(d.properties["B_#1_%aft7:00"]));
+                            $('#b_nodst-min-sun-7').html(symbolVal(d.properties["B_#1 hour"]));
+                            $('#b_memorial-pr-sun-7').html(symbolVal(d.properties["B_#2_%aft7:00"]));
+                            $('#b_memorial-min-sun-7').html(symbolVal(d.properties["B_#2 hour"]));
+                            $('#b_1966-pr-sun-7').html(symbolVal(d.properties["B_#3_%aft7:00"]));
+                            $('#b_1966-min-sun-7').html(symbolVal(d.properties["B_#3 hour"]));
+                            $('#b_current-pr-sun-7').html(symbolVal(d.properties["B_#4_%aft7:00"]));
+                            $('#b_current-min-sun-7').html(symbolVal(d.properties["B_#4 hour"]));
+                            $('#b_permanent-pr-sun-7').html(symbolVal(d.properties["B_#5_%aft7:00"]));
+                            $('#b_permanent-min-sun-7').html(symbolVal(d.properties["B_#5 hour"]));
+                        } else {
+                            console.log('Mouseover disable');
+                        }                        
+                    })
+                    .on("mouseout", (event, d) => {
+                        // disable highlight same feature on double map
+                        $("#g2"+ d.properties.Count).css("fill", colorScale(parseInt(d.properties.Color_2)));
+                        $("#g2"+ d.properties.Count).css("stroke", colorScale(parseInt(d.properties.Color_2)));
+
+                        // hide tooltips
+                        tooltip.style("opacity", 0);
+                        tooltip2.style("opacity", 0);
+                    })
+                    .on('click', function(event, d) {
+                        // change table data dynamically after each click
+                        let selectedVal = $('input[name="radiogroup"]:checked').val();
+
+                        if (selectedVal === 'click') {
+                            $('#county-name').html(d.properties.Header);
+                            $('#data-population').html(d.properties.k_population);
+                            $('#data-delay').html(d.properties.Delay);
+                            $('#data-delay-dst').html(d.properties["Delay with DST"]);
+                            $('#nodst-pr-sun-7').html(d.properties["#1_%aft7:00"]);
+                            $('#nodst-min-sun-7').html(d.properties["#1 hour"]);
+                            $('#memorial-pr-sun-7').html(d.properties["#2_%aft7:00"]);
+                            $('#memorial-min-sun-7').html(d.properties["#2 hour"]);
+                            $('#1966-pr-sun-7').html(d.properties["#3_%aft7:00"]);
+                            $('#1966-min-sun-7').html(d.properties["#3 hour"]);
+                            $('#current-pr-sun-7').html(d.properties["#4_%aft7:00"]);
+                            $('#current-min-sun-7').html(d.properties["#4 hour"]);
+                            $('#permanent-pr-sun-7').html(d.properties["#5_%aft7:00"]);
+                            $('#permanent-min-sun-7').html(d.properties["#5 hour"]);
+
+                            $('#b_data-delay').html(symbolVal(d.properties.B_Delay));
+                            $('#b_data-delay-dst').html(symbolVal(d.properties["B_Delay with DST"]));
+                            $('#b_nodst-pr-sun-7').html(symbolVal(d.properties["B_#1_%aft7:00"]));
+                            $('#b_nodst-min-sun-7').html(symbolVal(d.properties["B_#1 hour"]));
+                            $('#b_memorial-pr-sun-7').html(symbolVal(d.properties["B_#2_%aft7:00"]));
+                            $('#b_memorial-min-sun-7').html(symbolVal(d.properties["B_#2 hour"]));
+                            $('#b_1966-pr-sun-7').html(symbolVal(d.properties["B_#3_%aft7:00"]));
+                            $('#b_1966-min-sun-7').html(symbolVal(d.properties["B_#3 hour"]));
+                            $('#b_current-pr-sun-7').html(symbolVal(d.properties["B_#4_%aft7:00"]));
+                            $('#b_current-min-sun-7').html(symbolVal(d.properties["B_#4 hour"]));
+                            $('#b_permanent-pr-sun-7').html(symbolVal(d.properties["B_#5_%aft7:00"]));
+                            $('#b_permanent-min-sun-7').html(symbolVal(d.properties["B_#5 hour"]));
+                        } else {
+                            console.log('Clicking disable')
+                        }
+                    });	  
+                
+                // add states layer for first map
+                g1.append("g")
+                    .selectAll("path")
+                    .data(states.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("stroke", "#444444")
+                    .attr("stroke-width", 0.75)
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("fill", "none")
+                    .style("pointer-events", "none"); 
+
+                // --------------------------------------  //
+
+                // add counties layer to second map
+                g2.append("g")
+                    .selectAll("path")
+                    .data(counties.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("id", (d) => 'g2' + d.properties.Count)
+                    .attr("fill", (d) => colorScale(parseInt(d.properties.Color_2)))
+                    .attr("stroke", (d) => colorScale(parseInt(d.properties.Color_2)))
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("class", "county")
+                    .on('mouseover', function (event, d)  {
+                        // highlight same feature in double map function
+                        $("#g1"+ d.properties.Count).css("fill", "#d6206c");
+                        $("#g1"+ d.properties.Count).css("stroke", "#d6206c");
+                        // show first tooltip
+                        tooltip.style("opacity", .9);
+                        // set left padding for first tooltip
+                        tooltip.style("left", (function () { 
+                            let tooltipWidth = document.getElementById('tooltip').getBoundingClientRect().width; // tooltip width
+                            let svgContainerWidth = document.getElementById('svgContainer').getBoundingClientRect().width; // width of whole svg container
+                            let boxWidth = svgContainerWidth / 2; // width of one svg 
+                            let padMain = (window.innerWidth / 100) * 2; // additional padding of '.main' div
+                            let limitWidth = (window.innerWidth - padMain - tooltipWidth) + 10; // max mouse left coords for standard tooltip position
+                            if (event.pageX > limitWidth) {return (event.pageX - tooltipWidth) + "px";} // if mouse coords is more than limit
+                            else {return event.pageX + "px";} // if mouse coords is standard
+                        })); 
+                        // set top padding for first tooltip                               
+                        tooltip.style("top", (function () {
+                            let headerHeight = document.getElementById('header').getBoundingClientRect().height;
+                            let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height;
+                            let limitHeight = headerHeight + (tooltipHeight * 1.2); 
+                            if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"} // if mouse coords is more than limit
+                            else {return (event.pageY - (tooltipHeight * 1.1)) + "px"} // if mouse coords is standard
+                        })); 
+                        // show second tooltip
+                        tooltip2.style("opacity", .9);
+                        // set left padding for second tooltip
+                        tooltip2.style("left", (function () { 
+                            let tooltipWidth = document.getElementById('tooltip2').getBoundingClientRect().width; // tooltip width
+                            let svgContainerWidth = document.getElementById('svgContainer').getBoundingClientRect().width; // width of whole svg container
+                            let boxWidth = svgContainerWidth / 2; // width of one svg 
+                            let padMain = (window.innerWidth / 100) * 2; // additional padding of '.main' div
+                            let limitWidth = (window.innerWidth - padMain - tooltipWidth) + 10; // max mouse left coords for standard tooltip position
+                            if (event.pageX > limitWidth) {return ((event.pageX - boxWidth) - tooltipWidth)  + "px";} // if mouse coords is more than limit
+                            else {return (event.pageX - boxWidth) + "px";} // if mouse coords is standard
+                        }));  
+                        // set top padding for tooltip                               
+                        tooltip2.style("top", (function () {
+                            let headerHeight = document.getElementById('header').getBoundingClientRect().height;
+                            let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height;
+                            let limitHeight = headerHeight + (tooltipHeight * 1.2);
+                            if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"}
+                            else {return (event.pageY - (tooltipHeight * 1.1)) + "px"}
+                        })); 
+                        // add dynamic content to tooltips
+                        tooltip.html("<span style='color: black;'>Short DST: </span><span style='color: #6b1b10;'>" + d.properties["#2_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#2_%aft7:00"]) + "</span><br><span style='color: black;'>Long DST:&nbsp;</span><span style='color: #6b1b10;'>" + d.properties["#4_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#4_%aft7:00"]) + "</span>");
+                        tooltip2.html("<span style='color: black;'>Short DST: </span><span style='color: #6b1b10;'>" + d.properties["#2_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#2_%aft7:00"]) + "</span><br><span style='color: black;'>Long DST:&nbsp;</span><span style='color: #6b1b10;'>" + d.properties["#4_%aft7:00"] + "</span>  <span style='color: black;'>" + symbolVal(d.properties["B_#4_%aft7:00"]) + "</span>");
+                        
+                        // change table data dynamically after each mouseover
+                        let selectedVal = $('input[name="radiogroup"]:checked').val(); 
+                        if (selectedVal === 'mouse') {
+                            $('#county-name').html(d.properties.Header);
+                            $('#data-population').html(d.properties.k_population);
+                            $('#data-delay').html(d.properties.Delay);
+                            $('#data-delay-dst').html(d.properties["Delay with DST"]);
+                            $('#nodst-pr-sun-7').html(d.properties["#1_%aft7:00"]);
+                            $('#nodst-min-sun-7').html(d.properties["#1 hour"]);
+                            $('#memorial-pr-sun-7').html(d.properties["#2_%aft7:00"]);
+                            $('#memorial-min-sun-7').html(d.properties["#2 hour"]);
+                            $('#1966-pr-sun-7').html(d.properties["#3_%aft7:00"]);
+                            $('#1966-min-sun-7').html(d.properties["#3 hour"]);
+                            $('#current-pr-sun-7').html(d.properties["#4_%aft7:00"]);
+                            $('#current-min-sun-7').html(d.properties["#4 hour"]);
+                            $('#permanent-pr-sun-7').html(d.properties["#5_%aft7:00"]);
+                            $('#permanent-min-sun-7').html(d.properties["#5 hour"]);
+
+                            $('#b_data-delay').html(symbolVal(d.properties.B_Delay));
+                            $('#b_data-delay-dst').html(symbolVal(d.properties["B_Delay with DST"]));
+                            $('#b_nodst-pr-sun-7').html(symbolVal(d.properties["B_#1_%aft7:00"]));
+                            $('#b_nodst-min-sun-7').html(symbolVal(d.properties["B_#1 hour"]));
+                            $('#b_memorial-pr-sun-7').html(symbolVal(d.properties["B_#2_%aft7:00"]));
+                            $('#b_memorial-min-sun-7').html(symbolVal(d.properties["B_#2 hour"]));
+                            $('#b_1966-pr-sun-7').html(symbolVal(d.properties["B_#3_%aft7:00"]));
+                            $('#b_1966-min-sun-7').html(symbolVal(d.properties["B_#3 hour"]));
+                            $('#b_current-pr-sun-7').html(symbolVal(d.properties["B_#4_%aft7:00"]));
+                            $('#b_current-min-sun-7').html(symbolVal(d.properties["B_#4 hour"]));
+                            $('#b_permanent-pr-sun-7').html(symbolVal(d.properties["B_#5_%aft7:00"]));
+                            $('#b_permanent-min-sun-7').html(symbolVal(d.properties["B_#5 hour"]));
+                        } else {
+                            console.log('Mouseover disable');
+                        }                        
+                    })
+                    .on("mouseout", (event, d) => {
+                        // disable highlight same feature on double map
+                        $("#g1"+ d.properties.Count).css("fill", colorScale(parseInt(d.properties.Color_1)));
+                        $("#g1"+ d.properties.Count).css("stroke", colorScale(parseInt(d.properties.Color_1)));
+
+                        tooltip.style("opacity", 0);
+                        tooltip2.style("opacity", 0);
+                    })
+                    .on('click', function(event, d) {
+                        // change table data dynamically after each click
+                        let selectedVal = $('input[name="radiogroup"]:checked').val();
+
+                        if (selectedVal === 'click') {
+                            $('#county-name').html(d.properties.Header);
+                            $('#data-population').html(d.properties.k_population);
+                            $('#data-delay').html(d.properties.Delay);
+                            $('#data-delay-dst').html(d.properties["Delay with DST"]);
+                            $('#nodst-pr-sun-7').html(d.properties["#1_%aft7:00"]);
+                            $('#nodst-min-sun-7').html(d.properties["#1 hour"]);
+                            $('#memorial-pr-sun-7').html(d.properties["#2_%aft7:00"]);
+                            $('#memorial-min-sun-7').html(d.properties["#2 hour"]);
+                            $('#1966-pr-sun-7').html(d.properties["#3_%aft7:00"]);
+                            $('#1966-min-sun-7').html(d.properties["#3 hour"]);
+                            $('#current-pr-sun-7').html(d.properties["#4_%aft7:00"]);
+                            $('#current-min-sun-7').html(d.properties["#4 hour"]);
+                            $('#permanent-pr-sun-7').html(d.properties["#5_%aft7:00"]);
+                            $('#permanent-min-sun-7').html(d.properties["#5 hour"]);
+
+                            $('#b_data-delay').html(symbolVal(d.properties.B_Delay));
+                            $('#b_data-delay-dst').html(symbolVal(d.properties["B_Delay with DST"]));
+                            $('#b_nodst-pr-sun-7').html(symbolVal(d.properties["B_#1_%aft7:00"]));
+                            $('#b_nodst-min-sun-7').html(symbolVal(d.properties["B_#1 hour"]));
+                            $('#b_memorial-pr-sun-7').html(symbolVal(d.properties["B_#2_%aft7:00"]));
+                            $('#b_memorial-min-sun-7').html(symbolVal(d.properties["B_#2 hour"]));
+                            $('#b_1966-pr-sun-7').html(symbolVal(d.properties["B_#3_%aft7:00"]));
+                            $('#b_1966-min-sun-7').html(symbolVal(d.properties["B_#3 hour"]));
+                            $('#b_current-pr-sun-7').html(symbolVal(d.properties["B_#4_%aft7:00"]));
+                            $('#b_current-min-sun-7').html(symbolVal(d.properties["B_#4 hour"]));
+                            $('#b_permanent-pr-sun-7').html(symbolVal(d.properties["B_#5_%aft7:00"]));
+                            $('#b_permanent-min-sun-7').html(symbolVal(d.properties["B_#5 hour"]));
+                        } else {
+                            console.log('Clicking disable')
+                        }
+                    });	  
+                
+                // add states layer
+                g2.append("g")
+                    .selectAll("path")
+                    .data(states.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("stroke", "#444444")
+                    .attr("stroke-width", 0.75)
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("fill", "none")
+                    .style("pointer-events", "none"); 
+
+                // add lines layer
+                g2.append("g")
+                    .selectAll("path")
+                    .data(lines.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("stroke", "#111111")
+                    .attr("stroke-width", 2)
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("fill", "none")
+                    .style("pointer-events", "none"); 
+                // --------------------------------------  //
+
+                // add map comment
+                const mapComment = svgCont.append("text")
+                    .attr("id", "mapComment")
+                    .style("position", 'absolute')
+                    .text("Map is click, drag, & zoomable.");
+                    
+                // add radio buttons to the map
+                const radio = svgCont.append("form")
+                    .attr("id", "radioGroup")
+                    .style("position", 'absolute');
+
+                radio.html('<input type="radio" id="enable" name="radiogroup" value="click"  />\
+                    <label for="enable">Table changes when clicking</label></br>\
+                    <input type="radio" id="disable" name="radiogroup" value="mouse" checked />\
+                    <label for="disable">Continuously changing Table</label>');       
+
+                // add map titles
+                const mapTitle = svg1.append("text")
+                    .attr("x", 250)
+                    .attr("y", 15)
+                    .attr("id", "mapTitle")
+                    .text("BEFORE");		
+
+                const mapTitle2 = svg2.append("text")
+                    .attr("x", 250)
+                    .attr("y", 15)
+                    .attr("id", "mapTitle")
+                    .text("AFTER");	
+                    
+                let bbox = mapTitle.node().getBBox();
+                let bbox2 = mapTitle2.node().getBBox();
+                let tpadding = 2.5;
+                let rect = svg1.insert("rect", "text")
+                    .attr("x", bbox.x - tpadding)
+                    .attr("y", bbox.y - tpadding)
+                    .attr("width", bbox.width + (tpadding*2))
+                    .attr("height", bbox.height + (tpadding*2))
+                    .style("fill", "#ffffffb3");
+                let rect2 = svg2.insert("rect", "text")
+                    .attr("x", bbox2.x - tpadding)
+                    .attr("y", bbox2.y - tpadding)
+                    .attr("width", bbox2.width + (tpadding*2))
+                    .attr("height", bbox2.height + (tpadding*2))
+                    .style("fill", "#ffffffb3");    
+
+                // add zoom and drag functionality to the map
+                svgCont.call(d3.zoom()
+                    .extent([[0, 0], [w, h]])
+                    .scaleExtent([1, 8])
+                    .on("zoom", zoomed));
+
+                function zoomed({transform}) {
+                    g1.attr("transform", transform);
+                    g2.attr("transform", transform);
+                };
+
+                $('input[type=radio][name=radiogroup]').change(function() {
+                    startRadio = 'off';
+                });
+            };
+
+		</script>
+
+	</body>
+</html>
