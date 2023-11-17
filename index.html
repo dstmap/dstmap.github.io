@@ -348,9 +348,9 @@
                         }));  
                         // set top padding for first tooltip                               
                         tooltip.style("top", (function () {
-                            let headerHeight = document.getElementById('header').getBoundingClientRect().height; // get '.header' height
+                            // let headerHeight = document.getElementById('header').getBoundingClientRect().height; // get '.header' height
                             let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height; // tooltip height
-                            let limitHeight = headerHeight + (tooltipHeight * 1.2); // max mouse vertical coords for standard tooltip position
+                            let limitHeight = 10 + (tooltipHeight * 1.2); // max mouse vertical coords for standard tooltip position
                             if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"} // if mouse coords is more than limit
                             else {return (event.pageY - (tooltipHeight * 1.1)) + "px"} // if mouse coords is standard
                         })); 
@@ -368,9 +368,9 @@
                         }));  
                         // set top padding for tooltip                               
                         tooltip2.style("top", (function () {
-                            let headerHeight = document.getElementById('header').getBoundingClientRect().height; // get '.header' height
+                            //let headerHeight = document.getElementById('header').getBoundingClientRect().height; // get '.header' height
                             let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height; // tooltip height
-                            let limitHeight = headerHeight + (tooltipHeight * 1.2); // max mouse vertical coords for standard tooltip position
+                            let limitHeight = 10 + (tooltipHeight * 1.2); // max mouse vertical coords for standard tooltip position
                             if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"} // if mouse coords is more than limit
                             else {return (event.pageY - (tooltipHeight * 1.1)) + "px"} // if mouse coords is standard
                         }));  
@@ -518,9 +518,9 @@
                         })); 
                         // set top padding for first tooltip                               
                         tooltip.style("top", (function () {
-                            let headerHeight = document.getElementById('header').getBoundingClientRect().height;
+                            //let headerHeight = document.getElementById('header').getBoundingClientRect().height;
                             let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height;
-                            let limitHeight = headerHeight + (tooltipHeight * 1.2); 
+                            let limitHeight = 10 + (tooltipHeight * 1.2); 
                             if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"} // if mouse coords is more than limit
                             else {return (event.pageY - (tooltipHeight * 1.1)) + "px"} // if mouse coords is standard
                         })); 
@@ -538,9 +538,9 @@
                         }));  
                         // set top padding for tooltip                               
                         tooltip2.style("top", (function () {
-                            let headerHeight = document.getElementById('header').getBoundingClientRect().height;
+                            // let headerHeight = document.getElementById('header').getBoundingClientRect().height;
                             let tooltipHeight = document.getElementById('tooltip').getBoundingClientRect().height;
-                            let limitHeight = headerHeight + (tooltipHeight * 1.2);
+                            let limitHeight = 10 + (tooltipHeight * 1.2);
                             if (event.pageY < limitHeight) {return (event.pageY + (tooltipHeight * 1.1)) + "px"}
                             else {return (event.pageY - (tooltipHeight * 1.1)) + "px"}
                         })); 
