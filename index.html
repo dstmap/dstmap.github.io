@@ -81,8 +81,8 @@
                 display: flex;
             }       
             .left-side {
-                font-size: 1.1vw;
-                width: 24%;
+                font-size: 1.0.5vw;
+                width: 22%;
                 height: auto;
             }
             .left-side p {
@@ -110,7 +110,7 @@
                 font-weight: bold;
                 color: black;
                 padding-left: 0.25em;
-                width: 2.8em;
+                width: 2.7em;
             }
 			.county:hover {
                 fill: #d6206c;
@@ -131,10 +131,10 @@
             }	
             #radioGroup {
                 position: absolute;
-                font-size: 1.2vw;
+                font-size: 1.1vw;
                 background-color: #ffffffcc;
                 border-radius: 2px;
-                bottom: 0;
+                bottom: -10px;
                 left: 2px;
             }
             #mapComment {
@@ -142,7 +142,7 @@
                 font-size: 1.2vw;
                 background-color: #ffffffcc;
                 border-radius: 2px;
-                bottom: 0;
+                bottom: 4%;
                 left: 41%;
             }
             #radioGroup p {
@@ -166,19 +166,13 @@
 
 		    }	
             @media only screen and (max-width: 1040px) {
-                .left-side {font-size: 1.1vw;}
-                .header span {font-size: 1.3vw;}
-                .head-title {font-size: 2vw !important;}
-                .footer {font-size: 1.3vw;}
-                .footer b {font-size: 1.45vw;}
-                .header span {padding: 0.9vw;}
-                .footer span {padding: 0.9vw;}
+                .left-side {font-size: 1.05vw;}
                 .author {font-size: 1.1vw;}
                 .tooltip {
                     font-size: 1.2vw;
                 }
                 #radioGroup {
-                    font-size: 1.2vw;
+                    font-size: 1.1vw;
                     left: 0.5vw;
                     bottom: -1vw;
                     padding: 0.2vw;
@@ -476,6 +470,19 @@
                     .attr("d", path)
                     .attr("stroke", "#444444")
                     .attr("stroke-width", 0.75)
+                    .attr("stroke-linecap", "round")
+                    .attr("stroke-linejoin", "round")
+                    .attr("fill", "none")
+                    .style("pointer-events", "none"); 
+
+                g1.append("g")
+                    .selectAll("path")
+                    .data(lines.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("stroke", "#111111")
+                    .attr("stroke-width", 2)
                     .attr("stroke-linecap", "round")
                     .attr("stroke-linejoin", "round")
                     .attr("fill", "none")
