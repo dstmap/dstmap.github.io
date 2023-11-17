@@ -512,7 +512,7 @@
                             let svgContainerWidth = document.getElementById('svgContainer').getBoundingClientRect().width; // width of whole svg container
                             let boxWidth = svgContainerWidth / 2; // width of one svg 
                             let padMain = (window.innerWidth / 100) * 2; // additional padding of '.main' div
-                            let limitWidth = (window.innerWidth - padMain - tooltipWidth) + 5; // max mouse left coords for standard tooltip position
+                            let limitWidth = (window.innerWidth - padMain - tooltipWidth) - 15; // max mouse left coords for standard tooltip position
                             if (event.pageX > limitWidth) {return (event.pageX - tooltipWidth) + "px";} // if mouse coords is more than limit
                             else {return event.pageX + "px";} // if mouse coords is standard
                         })); 
@@ -532,7 +532,7 @@
                             let svgContainerWidth = document.getElementById('svgContainer').getBoundingClientRect().width; // width of whole svg container
                             let boxWidth = svgContainerWidth / 2; // width of one svg 
                             let padMain = (window.innerWidth / 100) * 2; // additional padding of '.main' div
-                            let limitWidth = (window.innerWidth - padMain - tooltipWidth) + 5; // max mouse left coords for standard tooltip position
+                            let limitWidth = (window.innerWidth - padMain - tooltipWidth) - 15; // max mouse left coords for standard tooltip position
                             if (event.pageX > limitWidth) {return ((event.pageX - boxWidth) - tooltipWidth)  + "px";} // if mouse coords is more than limit
                             else {return (event.pageX - boxWidth) + "px";} // if mouse coords is standard
                         }));  
